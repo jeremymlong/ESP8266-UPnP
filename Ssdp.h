@@ -30,15 +30,7 @@ public:
 	inline void setIPAddress(IPAddress ip) { _localIP = ip; }
 	void addDevice(UpnpDevice* device);
 
-protected:
-	inline IPAddress getIPAddress() { return _localIP; }
-	inline uint8 getTTL() { return _ttl; }
-	WiFiUDP* getMulticastSession() { return &_multicast; }
-
 private:
-	uint32 getNextBootID();
-	uint16 getConfigID();
-
 	WiFiUDP _multicast;
 	IPAddress _localIP;
 	uint8 _ttl;

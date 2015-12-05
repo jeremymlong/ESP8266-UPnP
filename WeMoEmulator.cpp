@@ -119,7 +119,7 @@ void WeMoEmulator::begin()
 #endif
 }
 
-void WeMoEmulator::loop()
+bool WeMoEmulator::respondToSearch()
 {
 	for (LinkedListItem<MSearchInfo*>* i = m_searchRequests.getFirst(); i; i = i->getNext())
 	{
@@ -129,10 +129,14 @@ void WeMoEmulator::loop()
 			respondToSearch(msearch);
 			m_searchRequests.remove(msearch);
 			delete msearch;
-			return;
+			return true;
 		}
 	}
+	return false;
+}
 
+void WeMoEmulator::loop()
+{
 	m_webServer.handleClient();
 }
 
@@ -172,18 +176,13 @@ void WeMoEmulator::sendNotify(NotifyType nt, WiFiUDP* session)
 
 void WeMoEmulator::respondToSearch(MSearchInfo* msearch)
 {
+#if defined(CONSOLE) && defined(DEBUG_WEMOEMULATOR)
+	CONSOLE.printf("WeMoEmulator::respondToSearch start ( %s )\n", m_friendlyName.c_str());
+#endif
 	WiFiUDP unicast;
 	bool result;
-	result = unicast.begin(SSDP_UNICAST_PORT);
-	if (!result)
-	{
-#if defined(CONSOLE) && defined(DEBUG_WEMOEMULATOR)
-		CONSOLE.printf("WeMoEmulator::respondToSearch WiFIUDP::begin failed for %s\n", m_friendlyName.c_str());
-#endif
-		goto onError;
-	}
 
-	unicast.beginPacket(msearch->RemoteIP, msearch->RemotePort);
+	result = unicast.beginPacket(msearch->RemoteIP, msearch->RemotePort);
 	if (!result)
 	{
 #if defined(CONSOLE) && defined(DEBUG_WEMOEMULATOR)
@@ -194,7 +193,7 @@ void WeMoEmulator::respondToSearch(MSearchInfo* msearch)
 
 	unicast.write("HTTP/1.1 200 OK\r\n");
 	unicast.write("CACHE-CONTROL: max-age=86400\r\n");
-	//unicast.printf("DATE: %s\r\n", getDateTime()->toString().c_str()); // TODO: get the date
+	unicast.printf("DATE: %s\r\n", getDateTime()->toString().c_str());
 	unicast.write("EXT: \r\n");
 	unicast.write("LOCATION: http://");
 	WiFi.localIP().printTo(unicast);
@@ -217,6 +216,10 @@ void WeMoEmulator::respondToSearch(MSearchInfo* msearch)
 
 onError:
 	unicast.stop();
+
+#if defined(CONSOLE) && defined(DEBUG_WEMOEMULATOR)
+	CONSOLE.printf("WeMoEmulator::respondToSearch finish ( %s )\n", m_friendlyName.c_str());
+#endif
 }
 
 bool WeMoEmulator::matchesSearch(String searchTerm)

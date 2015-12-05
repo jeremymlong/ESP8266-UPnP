@@ -19,6 +19,7 @@ public:
 	virtual bool matchesSearch(String searchTerm) = 0;
 	virtual void addSearchRequest(MSearchInfo* msearch) = 0;
 	virtual void setDateTime(DateTime* dateTime) = 0;
+	virtual bool respondToSearch() = 0;
 };
 
 #endif

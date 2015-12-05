@@ -1,6 +1,6 @@
 #include "HttpMessage.h"
 
-//#define DEBUG_HTTPRESPONSE
+//#define DEBUG_HTTPMESSAGE
 
 HttpMessage::HttpMessage() :
 	m_headers()
@@ -21,7 +21,7 @@ bool HttpMessage::hasHeader(String name)
 {
 	for (LinkedListItem<HttpHeader*>* i = m_headers.getFirst(); i; i = i->getNext())
 	{
-#if defined(CONSOLE) && defined(DEBUG_HTTPRESPONSE)
+#if defined(CONSOLE) && defined(DEBUG_HTTPMESSAGE)
 		CONSOLE.print("Searching Header: ");
 		CONSOLE.println(i->getItem()->Name);
 #endif
@@ -51,7 +51,7 @@ void HttpMessage::setHeader(String name, String value)
 	if (hasHeader(name))
 	{
 		header = getHeader(name);
-#if defined(CONSOLE) && defined(DEBUG_HTTPRESPONSE)
+#if defined(CONSOLE) && defined(DEBUG_HTTPMESSAGE)
 		CONSOLE.print("Found existing header: ");
 		CONSOLE.println(header->Name);
 #endif

@@ -23,6 +23,7 @@ public:
 	void sendNotify(NotifyType nt, WiFiUDP* session);
 	bool matchesSearch(String searchTerm);
 	void addSearchRequest(MSearchInfo* msearch);
+	bool respondToSearch();
 
 private:
 	void respondToSearch(MSearchInfo* msearch);

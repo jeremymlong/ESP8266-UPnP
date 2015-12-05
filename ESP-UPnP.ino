@@ -59,6 +59,7 @@ void setup()
 
 	dateTime->update();
 	dateTime->begin();
+	randomSeed(dateTime->getEpoch());
 
 	ssdp = new Ssdp(WiFi.localIP());
 	ssdp->setDateTime(dateTime);

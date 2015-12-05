@@ -8,7 +8,7 @@ struct MSearchInfo
 {
 	IPAddress RemoteIP;
 	uint16 RemotePort;
-	uint32 ProcessTime;
+	uint64 ProcessTime;
 	String SearchTarget;
 };
 

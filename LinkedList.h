@@ -78,7 +78,8 @@ public:
 
 	T remove(T item)
 	{
-		for (LinkedListItem<T>* i = m_first; i; i = i->m_next)
+		LinkedListItem<T>* prev = NULL;
+		for (LinkedListItem<T>* i = m_first; i; prev = i, i = i->m_next)
 		{
 			if (i->m_item == item)
 			{
@@ -86,9 +87,15 @@ public:
 				{
 					m_first = i->m_next;
 				}
-				else if (i->m_next)
+				else if (prev)
 				{
-					i->m_next = i->m_next->m_next;
+					prev->m_next = i->m_next;
+				}
+				else
+				{
+#if defined CONSOLE
+					CONSOLE.println("LinkedList: unexpected case");
+#endif
 				}
 				i->m_item = NULL;
 				i->m_next = NULL;

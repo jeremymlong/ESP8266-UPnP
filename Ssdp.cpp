@@ -34,7 +34,7 @@ void Ssdp::begin()
 		device->setDateTime(m_dateTime);
 		device->begin();
 
-		if (_multicast.beginPacketMulticast(SSDP_ADDR, SSDP_PORT, getIPAddress(), getTTL()))
+		if (_multicast.beginPacketMulticast(SSDP_ADDR, SSDP_PORT, _localIP, _ttl))
 		{
 			device->sendNotify(NT_ALIVE, &_multicast);
 			_multicast.endPacket();
@@ -51,11 +51,21 @@ void Ssdp::begin()
 void Ssdp::loop()
 {
 	m_timer.loop();
+
+	for (LinkedListItem<UpnpDevice*>* ud = m_devices.getFirst(); ud; ud = ud->getNext())
+	{
+		if (ud->getItem()->respondToSearch())
+		{
+			return;
+		}
+		ud->getItem()->loop();
+	}
+
 	if (m_timer.elapsed)
 	{
 		for (LinkedListItem<UpnpDevice*>* ud = m_devices.getFirst(); ud; ud = ud->getNext())
 		{
-			_multicast.beginPacketMulticast(SSDP_ADDR, SSDP_PORT, getIPAddress(), getTTL());
+			_multicast.beginPacketMulticast(SSDP_ADDR, SSDP_PORT, _localIP, _ttl);
 			ud->getItem()->sendNotify(NT_UPDATE, &_multicast);
 			_multicast.endPacket();
 		}
@@ -117,9 +127,6 @@ void Ssdp::loop()
 
 				for (LinkedListItem<UpnpDevice*>* ud = m_devices.getFirst(); ud; ud = ud->getNext())
 				{
-#if defined(CONSOLE) && defined(DEBUG_SSDP)
-					CONSOLE.println("\tstart loop");
-#endif
 					UpnpDevice* upnpDevice = ud->getItem();
 					if (upnpDevice->matchesSearch(stHeader->Value))
 					{
@@ -134,10 +141,6 @@ void Ssdp::loop()
 							upnpDevice->addSearchRequest(msearch);
 						}
 					}
-
-#if defined(CONSOLE) && defined(DEBUG_SSDP)
-					CONSOLE.println("\tend loop");
-#endif
 				}
 			}
 
@@ -145,12 +148,6 @@ void Ssdp::loop()
 			request = NULL;
 		}
 	} // End packet process
-
-
-	for (LinkedListItem<UpnpDevice*>* ud = m_devices.getFirst(); ud; ud = ud->getNext())
-	{
-		ud->getItem()->loop();
-	}
 }
 
 void Ssdp::addDevice(UpnpDevice* device)
