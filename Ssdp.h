@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 #include <WiFiUdp.h>
-#include <Timer.h>
 
+#include "Timer.h"
 #include "UpnpDevice.h"
 #include "DateTime.h"
 #include "HttpRequest.h"
@@ -35,7 +35,7 @@ private:
 	IPAddress _localIP;
 	uint8 _ttl;
 	DateTime* m_dateTime;
-	Arduino::Timer m_timer;
+	Timer m_timer;
 	uint8 _udpSendCount;
 	LinkedList<UpnpDevice*> m_devices;
 };

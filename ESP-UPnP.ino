@@ -1,4 +1,3 @@
-#include <Timer.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <WiFiServer.h>

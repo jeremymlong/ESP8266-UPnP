@@ -1,9 +1,10 @@
 #ifndef DATETIME_H_
 #define DATETIME_H_
 
-#include "HttpClient.h"
-#include <Timer.h>
 #include <functional>
+
+#include "HttpClient.h"
+#include "Timer.h"
 
 typedef String (*UpdateFunc)();
 
@@ -56,7 +57,7 @@ private:
 	uint8 m_minute;
 	uint8 m_second;
 	String m_timeZone;
-	Arduino::Timer m_timer;
+	Timer m_timer;
 	UpdateFunc updateFunc;
 };
 

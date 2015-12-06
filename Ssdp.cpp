@@ -18,7 +18,6 @@ Ssdp::~Ssdp()
 
 void Ssdp::begin()
 {
-	m_timer.setup(NULL);
 	bool result = _multicast.beginMulticast(_localIP, SSDP_ADDR, SSDP_PORT);
 #if defined(CONSOLE) && defined(DEBUG_SSDP)
 	if (!result)

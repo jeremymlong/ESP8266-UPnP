@@ -40,7 +40,6 @@ DateTime::~DateTime()
 
 void DateTime::begin()
 {
-	m_timer.setup(NULL);
 }
 
 void DateTime::loop()
