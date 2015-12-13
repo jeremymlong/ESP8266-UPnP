@@ -12,10 +12,6 @@
 #include "NotifyType.h"
 #include "LinkedList.h"
 
-#define SSDP_ADDR IPAddress(239,255,255,250)
-#define SSDP_PORT 1900
-#define SSDP_UNICAST_PORT 2869
-
 class Ssdp
 {
 public:

@@ -1,6 +1,8 @@
 #ifndef HTTPRESPONSE_H_
 #define HTTPRESPONSE_H_
 
+#include <Stream.h>
+
 #include "HttpMessage.h"
 
 class HttpResponse : 
@@ -8,7 +10,12 @@ class HttpResponse :
 {
 public:
 	HttpResponse();
+	void printTo(Stream* stream);
+
 	uint16 ResponseCode;
+
+private:
+	const char* getResponseCodeString();
 };
 
 #endif

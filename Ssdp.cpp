@@ -1,6 +1,6 @@
 #include "Ssdp.h"
 
-//#define DEBUG_SSDP
+#define DEBUG_SSDP
 #define SSDP_NOTIFY_SEC 1800
 
 Ssdp::Ssdp(IPAddress ip) :
@@ -151,5 +151,8 @@ void Ssdp::loop()
 
 void Ssdp::addDevice(UpnpDevice* device)
 {
+#if defined(CONSOLE) && defined(DEBUG_SSDP)
+	CONSOLE.println("Ssdp: Added device " + device->getFriendlyName());
+#endif
 	m_devices.add(device);
 }

@@ -64,3 +64,13 @@ void HttpMessage::setHeader(String name, String value)
 		m_headers.add(header);
 	}
 }
+
+void HttpMessage::printHeaders(Stream *stream)
+{
+	for (LinkedListItem<HttpHeader*>* i = m_headers.getFirst(); i; i = i->getNext())
+	{
+		HttpHeader* header = i->getItem();
+		stream->printf("%s: %s\r\n", header->Name.c_str(), header->Value.c_str());
+	}
+	stream->print("\r\n");
+}

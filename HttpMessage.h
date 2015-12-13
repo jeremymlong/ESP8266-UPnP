@@ -15,8 +15,9 @@ public:
 	bool hasHeader(String name);
 	void setHeader(String name, String value);
 
-private:
+protected:
 	LinkedList<HttpHeader*> m_headers;
+	void printHeaders(Stream *stream);
 };
 
 #endif

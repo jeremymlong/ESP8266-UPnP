@@ -12,6 +12,8 @@ public:
 	String RequestLine;
 	IPAddress RemoteIP;
 	uint16 RemotePort;
+
+	void printTo(Stream* stream);
 };
 
 #endif
