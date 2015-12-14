@@ -9,28 +9,23 @@ HttpClient::~HttpClient()
 {
 }
 
-HttpResponse* HttpClient::openUrl(IPAddress address, uint16 port, String url)
+void HttpClient::openUrl(HttpRequest *request, HttpResponse *response)
 {
 #if defined(CONSOLE) && defined(DEBUG_HTTPCLIENT)
 	CONSOLE.println("Opening connection");
 #endif
-	if (!connect(address, port))
+	if (!connect(request->RemoteIP, request->RemotePort))
 	{
 #if defined(CONSOLE) && defined(DEBUG_HTTPCLIENT)
 		CONSOLE.println("connection failed");
 #endif
-		return NULL;
+		return;
 	}
 
-	HttpResponse* response = new HttpResponse();
-
-	// This will send the request to the server
-	print(String("GET ") + url + " HTTP/1.1\r\n" +
-		"Host: " + address + "\r\n" +
-		"Connection: close\r\n\r\n");
+	request->printTo(this);
 
 	bool parsingHeaders = true;
-	// Read all the lines of the reply from server and print them to Serial
+
 	while (connected())
 	{
 		if (available())
@@ -53,17 +48,7 @@ HttpResponse* HttpClient::openUrl(IPAddress address, uint16 port, String url)
 #if defined(CONSOLE) && defined(DEBUG_HTTPCLIENT)
 	CONSOLE.println("Connection closed");
 #endif
-	return response;
-}
-
-HttpResponse* HttpClient::openUrl(String host, uint16_t port, String url)
-{
-	IPAddress remote_addr;
-	if (WiFi.hostByName(host.c_str(), remote_addr))
-	{
-		return openUrl(remote_addr, port, url);
-	}
-	return NULL;
+	return;
 }
 
 void HttpClient::parseHeaderLine(HttpResponse* response, String* line)

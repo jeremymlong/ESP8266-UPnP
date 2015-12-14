@@ -1,6 +1,7 @@
 #include "Ssdp.h"
 
-#define DEBUG_SSDP
+//#define DEBUG_SSDP
+
 #define SSDP_NOTIFY_SEC 1800
 
 Ssdp::Ssdp(IPAddress ip) :
@@ -136,6 +137,10 @@ void Ssdp::loop()
 							msearch->RemotePort = request->RemotePort;
 							msearch->SearchTarget = stHeader->Value;
 							uint8 mx = mxHeader->Value.toInt();
+							if (mx > 5)
+							{
+								mx = 5;
+							}
 							msearch->ProcessTime = random(mx * 1000) + millis();
 							upnpDevice->addSearchRequest(msearch);
 						}

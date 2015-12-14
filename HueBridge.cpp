@@ -1,20 +1,6 @@
 #include "HueBridge.h"
 
-/*
-SSDP.begin();
-SSDP.setSchemaURL((char*)"description.xml");
-SSDP.setHTTPPort(80);
-SSDP.setName((char*)"Philips hue clone");
-SSDP.setSerialNumber((char*)"001788102201");
-SSDP.setURL((char*)"index.html");
-SSDP.setModelName((char*)"Philips hue bridge 2012");
-SSDP.setModelNumber((char*)"929000226503");
-SSDP.setModelURL((char*)"http://www.meethue.com");
-SSDP.setManufacturer((char*)"Royal Philips Electronics");
-SSDP.setManufacturerURL((char*)"http://www.philips.com");
-*/
-
-#define DEBUG_HUEBRIDGE
+//#define DEBUG_HUEBRIDGE
 
 const char* setupTemplate =
 "<root>"
@@ -50,10 +36,12 @@ void HueBridge::setup()
 {
 	m_webServer.on("/description.xml", HTTP_GET, [this]()
 	{
+		Serial.println(ESP.getFreeHeap());
 		this->m_webServer.send(200, "text/plain", this->getDescriptionXml());
 	});
 	m_webServer.onNotFound([this]()
 	{
+		Serial.println(ESP.getFreeHeap());
 		auto webServer = &this->m_webServer;
 		String uri = webServer->uri();
 
@@ -139,7 +127,11 @@ void HueBridge::setup()
 									aJson.addItemToObject(briContent, "success", success);
 									aJson.addItemToArray(response, briContent);
 								}
-								webServer->send(200, "application/json", aJson.print(response));
+								char* json = aJson.print(response);
+								webServer->send(200, "application/json", json);
+								free(json);
+								aJson.deleteItem(response);
+								aJson.deleteItem(plainArg);
 							}
 							else
 							{
@@ -149,7 +141,9 @@ void HueBridge::setup()
 						}
 						// Return info for light
 						aJsonObject *item = light->getJSON();
-						webServer->send(200, "application/json", aJson.print(item));
+						char* json = aJson.print(item);
+						webServer->send(200, "application/json", json);
+						free(json);
 						aJson.deleteItem(item);
 						return;
 					}
@@ -167,7 +161,9 @@ void HueBridge::setup()
 					aJsonObject *item = light->getJSON();
 					aJson.addItemToObject(response, String(light->getID()).c_str(), item);
 				}
-				webServer->send(200, "application/json", aJson.print(response));
+				char* json = aJson.print(response);
+				webServer->send(200, "application/json", json);
+				free(json);
 				aJson.deleteItem(response);
 				return;
 			}

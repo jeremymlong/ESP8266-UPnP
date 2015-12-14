@@ -9,9 +9,11 @@ class HttpRequest :
 {
 public:
 	HttpRequest();
+	HttpRequest(IPAddress address, uint16 port, String url);
 	String RequestLine;
 	IPAddress RemoteIP;
 	uint16 RemotePort;
+	String Url;
 
 	void printTo(Stream* stream);
 };

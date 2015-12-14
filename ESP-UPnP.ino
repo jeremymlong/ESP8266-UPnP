@@ -55,17 +55,17 @@ void setup()
 	dateTime = new DateTime();
 	dateTime->setUpdateCallback([]()
 	{
-		HttpClient client;
-		HttpResponse *response = client.openUrl(WiFi.gatewayIP(), 80, "/");
-		String result = "";
+		HttpRequest request(WiFi.gatewayIP(), 80, "/");
+		HttpResponse response;
+		HttpClient().openUrl(&request, &response);
 
-		if (response->hasHeader("Date"))
+		String result;
+		if (response.hasHeader("Date"))
 		{
-			HttpHeader* dateHeader = response->getHeader("Date");
+			HttpHeader* dateHeader = response.getHeader("Date");
 			result = dateHeader->Value;
+			Serial.printf("Date: %s\n", result.c_str());
 		}
-
-		delete response;
 		return result;
 	});
 
@@ -78,29 +78,38 @@ void setup()
 	ssdp->setUdpSendCount(1);
 	ssdp->addDevice(new WeMoEmulator("Christmas Tree", TREE_PIN, 8080U));
 	ssdp->addDevice(new WeMoEmulator("Garland", GARL_PIN, 8081U));
-
+	
 	HueBridge *bridge = new HueBridge(8082);
 	HueLight *deskLamp = new HueLight(1, "Desk Lamp");
 	deskLamp->setBrightnessChangedHandler([](uint8 b) 
 	{
+		Serial.printf("Set desk lamp brightness to: %u\n", b);
 		l = b;
 		updateDeskLamp();
 	});
 	deskLamp->setStateChangedHandler([](bool s) 
 	{
+		Serial.printf("Set desk lamp state to: %s\n", s ? "on" : "off");
 		state = s;
 		updateDeskLamp();
 	});
 
-	HueLight *deskLampHue = new HueLight(2, "Desk Lamp Color");
-	deskLampHue->setBrightnessChangedHandler([](uint8 b)
+	HueLight *deskLampColor = new HueLight(2, "Lamp Color");
+	deskLampColor->setStateChangedHandler([](bool value)
 	{
+		Serial.printf("Set lamp color to: %s\n", value ? "on" : "off");
+		s = value ? 255 : 0;
+		updateDeskLamp();
+	});
+	deskLampColor->setBrightnessChangedHandler([](uint8 b)
+	{
+		Serial.printf("Set lamp color to: %u\n", b);
 		h = b;
 		updateDeskLamp();
 	});
 
 	bridge->addLight(deskLamp);
-	bridge->addLight(deskLampHue);
+	bridge->addLight(deskLampColor);
 	ssdp->addDevice(bridge);
 	ssdp->begin();
 	
@@ -138,6 +147,7 @@ void updateDeskLamp()
 	{
 		setRgbColor(0, 0, 0);
 	}
+	Serial.printf("Free Heap: %u\n", ESP.getFreeHeap());
 }
 
 void loop()
