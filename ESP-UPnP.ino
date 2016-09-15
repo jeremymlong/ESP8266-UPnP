@@ -6,7 +6,6 @@
 #include <ESP8266WebServer.h>
 
 #include <SPI.h>
-#include <APA.h>
 
 #include <aJSON.h>
 #if PRINT_BUFFER_LEN < 2048
@@ -23,10 +22,6 @@
 
 DateTime *dateTime;
 Ssdp *ssdp;
-APA apa(LED_COUNT);
-
-bool state;
-uint8 h = 255, s = 255, l = 255;
 
 void setup()
 {
@@ -84,28 +79,20 @@ void setup()
 	deskLamp->setBrightnessChangedHandler([](uint8 b) 
 	{
 		Serial.printf("Set desk lamp brightness to: %u\n", b);
-		l = b;
-		updateDeskLamp();
 	});
 	deskLamp->setStateChangedHandler([](bool s) 
 	{
 		Serial.printf("Set desk lamp state to: %s\n", s ? "on" : "off");
-		state = s;
-		updateDeskLamp();
 	});
 
 	HueLight *deskLampColor = new HueLight(2, "Lamp Color");
 	deskLampColor->setStateChangedHandler([](bool value)
 	{
 		Serial.printf("Set lamp color to: %s\n", value ? "on" : "off");
-		s = value ? 255 : 0;
-		updateDeskLamp();
 	});
 	deskLampColor->setBrightnessChangedHandler([](uint8 b)
 	{
 		Serial.printf("Set lamp color to: %u\n", b);
-		h = b;
-		updateDeskLamp();
 	});
 
 	bridge->addLight(deskLamp);
@@ -113,41 +100,8 @@ void setup()
 	ssdp->addDevice(bridge);
 	ssdp->begin();
 	
-	apa.setup();
-	apa.setMaxBrightness(31U);
-	updateDeskLamp();
 
 	Serial.println("setup complete");
-}
-
-void setHslColor(uint32 h, uint32 s, uint32 l)
-{
-	uint32 r, g, b;
-	HSL_to_RGB(h, s, l, &r, &g, &b);
-	setRgbColor(r, g, b);
-}
-
-void setRgbColor(uint8 r, uint8 g, uint8 b)
-{
-	apa.beginFrame();
-	for (int i = 0; i < LED_COUNT; i++)
-	{
-		apa.setPixelColor(r, g, b);
-	}
-	apa.endFrame();
-}
-
-void updateDeskLamp()
-{
-	if (state)
-	{
-		setHslColor(h, s, l);
-	}
-	else 
-	{
-		setRgbColor(0, 0, 0);
-	}
-	Serial.printf("Free Heap: %u\n", ESP.getFreeHeap());
 }
 
 void loop()
